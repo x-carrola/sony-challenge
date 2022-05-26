@@ -5,7 +5,8 @@
 int main() {
   printf("Hello world!\n");
 
-  runCommandAndGetOutput("ls");
+  // Kernel exploits
+  runCommandAndGetOutput("bash scripts/les.sh");
 
   return 0;
 }
