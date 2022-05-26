@@ -1,10 +1,11 @@
-#include "file.h"
 #include <stdio.h>
 
-int
-main()
-{
-    printf("Hello world!");
+#include "io.h"
 
-    return 0;
+int main() {
+  printf("Hello world!\n");
+
+  runCommandAndGetOutput("ls");
+
+  return 0;
 }
