@@ -10,21 +10,28 @@ will assume that we already have access to the target and that we want mainly tw
 Here are the **attack vectors** chosen for exploitation attempt:
 * kernel vulnerabilities
 * Linux utilities vulnerabilities
-* 
+* Processes
+* Services
+* Sockets
+* Network
+* Users
+* writable PATH abuses
 
-
-* Check if we are inside a container (Docker or lxc) and try to escape from it
-* Credentials stored in clear text in memory
-* Explore capabilities
+Some possible attack vectors and additional system information were left aside since I considered they had a lower 
+cost/benefit ratio. Here are some of them:
 * Explore additional defense mechanisms: SELinux, App Armor, etc.
+* Container breakout (Docker or lxc) if that's the case
+* Process monitoring (using [pspy](https://github.com/DominicBreuker/pspy), for example)
+* Credentials stored in clear text in memory
+* Explore user capabilities
+* Shell session hijacking
+* Library hijacking
 
+**Assumptions** for this case:
 
-
-Assumptions:
-
-* we already have access to the target
-* the target is running a Linux distro
-* bash is available in the target
+* have non-root access to the target
+* target is running a Linux distro
+* bash is available on the target
 
 
 # Instructions
@@ -37,7 +44,7 @@ make
 
 To run the program:
 ```
-./out/output
+./sony-challenge
 ```
 
 
@@ -92,52 +99,10 @@ Besides that, we must search other users in the system, in which can we login an
 
 ## Attack vector #8 - Writable PATH abuses
 
-### Find writable folders in PATH
+If some of the folders in PATH is writable, we may be able to escalate privileges by creating a backdoor inside that 
+writable folder with the name of some command that is going to be executed by a different user (root ideally).
 
-for dir in ${PATH//:/ }; do
-    [ -L "$dir" ] && printf "%b" "symlink, "
-    if [ ! -d "$dir" ]; then
-        printf "%b" "missing\t\t"
-          (( exit_code++ ))
-    elif [ "$(ls -lLd $dir | grep '^d.......w. ')" ]; then
-          printf "%b" "world writable\t"
-          (( exit_code++ ))
-    else
-          printf "%b" "ok\t\t"
-    fi
-    printf "%b" "$dir\n"
-done
+We can also check if some binary has the SUID or SGID bit.
 
-### Find SUID binaries
-
-find / -perm -4000 2>/dev/null #Find all SUID binaries
-
-### .sh files in PATH
-
-echo $PATH | tr ":" "\n" | while read d; do
-  for f in $(find "$d" -name "*.sh" 2>/dev/null); do
-    if ! [ "$IAMROOT" ] && [ -O "$f" ]; then
-      echo "You own the script: $f" | sed -${E} "s,.*,${SED_RED},"
-    elif ! [ "$IAMROOT" ] && [ -w "$f" ]; then #If write permision, win found (no check exploits)
-      echo "You can write script: $f" | sed -${E} "s,.*,${SED_RED_YELLOW},"
-    else
-      echo $f | sed -${E} "s,$shscripsG,${SED_GREEN}," | sed -${E} "s,$Wfolders,${SED_RED},";
-    fi
-  done
-done
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Last but not least, we can also check if there are any .sh files in our PATH directories. If so, we may create a 
+backdoor in one of them.
