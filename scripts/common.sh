@@ -31,6 +31,11 @@ NC="${C}[0m"
 UNDERLINED="${C}[5m"
 ITALIC="${C}[3m"
 
+groupsB="\(root\)|\(shadow\)|\(admin\)|\(video\)|\(adm\)|\(wheel\)|\(auth\)"
+groupsVB="\(sudo\)|\(docker\)|\(lxd\)|\(disk\)|\(lxc\)"
+knw_grps='\(lpadmin\)|\(cdrom\)|\(plugdev\)|\(nogroup\)' #https://www.togaware.com/linux/survivor/Standard_Groups.html
+mygroups=$(groups 2>/dev/null | tr " " "|")
+
 MyUID=$(id -u $(whoami))
 if [ "$MyUID" ]; then myuid=$MyUID; elif [ $(id -u $(whoami) 2>/dev/null) ]; then myuid=$(id -u $(whoami) 2>/dev/null); elif [ "$(id 2>/dev/null | cut -d "=" -f 2 | cut -d "(" -f 1)" ]; then myuid=$(id 2>/dev/null | cut -d "=" -f 2 | cut -d "(" -f 1); fi
 if [ $myuid -gt 2147483646 ]; then baduid="|$myuid"; fi

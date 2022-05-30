@@ -4,13 +4,12 @@ CFLAGS += -ansi -std=gnu99
 MKDIR ?= mkdir -p
 
 # DIRECTORIES
-OUT_DIR := out
 BUILD_DIR := build
 INC_DIR := include
 SRC_DIR := src
 
 # FILES
-EXEC := $(OUT_DIR)/output
+EXEC := sony-challenge
 SRCS := $(wildcard $(SRC_DIR)/*.c)
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 
@@ -34,4 +33,4 @@ $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 
 # Cleaning rule
 clean:
-	rm -rf $(BUILD_DIR) $(OUT_DIR)
+	rm -rf $(BUILD_DIR)

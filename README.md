@@ -27,6 +27,19 @@ Assumptions:
 * bash is available in the target
 
 
+# Instructions
+
+To build the program:
+```
+cd sony-challenge
+make
+```
+
+To run the program:
+```
+./out/output
+```
+
 
 ## Attack vector #1 - Kernel vulnerabilities
 
@@ -59,58 +72,23 @@ place there an executable with the same name as the relative path binary called 
 
 ## Attack vector #5 - Sockets
 
-### Writable sockets and check if they are calling writable binaries
+Sockets allow communication between two different processes. Just like services, we can check if any .socket file is 
+writable. If so, we can add a backdoor to this configuration file that will be executed when the configuration file 
+is called again.
 
-
+Moreover, if we find any writable socket (not .socket config files, the socket file itself) then we can communicate 
+with it and maybe exploit a vulnerability.
 
 ## Attack vector #6 - Network
 
-## Info about network config
-
-#Hostname, hosts and DNS
-cat /etc/hostname /etc/hosts /etc/resolv.conf
-dnsdomainname
-
-#Content of /etc/inetd.conf & /etc/xinetd.conf
-cat /etc/inetd.conf /etc/xinetd.conf
-
-#Interfaces
-cat /etc/networks
-(ifconfig || ip a)
-
-#Neighbours
-(arp -e || arp -a)
-(route || ip n)
-
-#Iptables rules
-(timeout 1 iptables -L 2>/dev/null; cat /etc/iptables/* | grep -v "^#" | grep -Pv "\W*\#" 2>/dev/null)
-
-#Files used by network services
-lsof -i
-
+We can get a bigger insight of the target by knowing what their network configurations are and what is the position of 
+the machine in the network. To enumerate the network, we will check the network interfaces config, the neighbours, 
+iptables rules and opened ports on the target.
 
 ## Attack vector #7 - Users
 
-## Info about users and groups
-
-#Info about me
-id || (whoami && groups) 2>/dev/null
-#List all users
-cat /etc/passwd | cut -d: -f1
-#List users with console
-cat /etc/passwd | grep "sh$"
-#List superusers
-awk -F: '($3 == "0") {print}' /etc/passwd
-#Currently logged users
-w
-#Login history
-last | tail
-#Last log of each user
-lastlog
-
-#List all users and their groups
-for i in $(cut -d":" -f1 /etc/passwd 2>/dev/null);do id $i;done 2>/dev/null | sort
-
+In order to escalate priviledges, it is important to check which user are we and which privileges does it have. 
+Besides that, we must search other users in the system, in which can we login and which ones have root priviledges.
 
 ## Attack vector #8 - Writable PATH abuses
 
